@@ -1,2 +1,6 @@
 # node-send-mail
-Nodeでメールを送るヨ
+
+Node でメールを送るヨ
+
+▽ ざっくり概要図
+![image](image.png)
