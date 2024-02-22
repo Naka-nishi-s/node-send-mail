@@ -1,95 +1,52 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import axios, { AxiosError } from "axios";
+import styles from "./page.module.css";
 
 export default function Home() {
+  /** 送信ボタン押下時 */
+  const handleRequestData: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+
+    /** 入力内容をフォームデータにまとめる */
+    const formData = new FormData(e.currentTarget);
+
+    // データを送る
+    axios
+      .post("/api/mail", formData)
+      .then((response) => console.log(response.data))
+      .catch((error: AxiosError) =>
+        console.error(`Status:${error.status}, Message:${error.response?.data}`)
+      );
+  };
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+      <p>フォーム</p>
+      <form onSubmit={handleRequestData}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div style={{ display: "flex", gap: "20px" }}>
+            <label htmlFor="name">名前</label>
+            <input type="text" id="name" name="name" />
+          </div>
+
+          <div style={{ display: "flex", gap: "20px" }}>
+            <label htmlFor="email">メールアドレス</label>
+            <input type="email" id="email" name="email" />
+          </div>
+
+          <div style={{ display: "flex", gap: "20px" }}>
+            <label htmlFor="subject">題名</label>
+            <input type="text" id="subject" name="subject" />
+          </div>
+
+          <div style={{ display: "flex", gap: "20px" }}>
+            <label htmlFor="content">内容</label>
+            <textarea id="content" name="content" />
+          </div>
+          <input type="submit" value="送信" />
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      </form>
     </main>
-  )
+  );
 }

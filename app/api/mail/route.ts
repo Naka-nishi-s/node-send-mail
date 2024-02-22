@@ -1,25 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import nodemailer from "nodemailer";
 
 export async function POST(req: NextRequest) {
-  console.log("/api/Loginへ到達")
-
   /** formDataで来たらformData()で受け取る必要がある */
   const data = await req.formData();
 
-  /** ここでDBとの照合などの処理 */
-  console.log(data.get("name"))
-  console.log(data.get("pass"))
-  const ok = true;
+  // データの取り出し
+  const name = data.get("name");
+  const email = data.get("email");
+  const content = data.get("content");
+  const subject = data.get("subject");
 
-  if (!ok) {
-    return NextResponse.json({ msg: "ログイン情報が誤っています。" }, { status: 500 })
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_SEND_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_SEND_USER,
+    to: process.env.EMAIL_RECEIVE_USER,
+    subject: subject,
+    text: `送信者：${email}\n\n内容:${content}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions)
+    return new Response(JSON.stringify({ message: "送信成功" }), { status: 200 })
+  } catch (error) {
+    console.log(error);
+    return new Response(JSON.stringify({ message: "送信失敗" }), { status: 500 })
   }
-
-  // 301 Redirectをしたが、うまくいかず。
-  // Cookieの設定は完璧、"/login"から"/"にリダイレクトをした形跡はある。認証も通っている。
-  // しかし、ページ遷移がされない。SPA特有の"ナニカ"の可能性が高い。
-  // 今回は、locationをjsonで返し。フロント側でページ遷移をさせることで解決。
-  const res = NextResponse.json({ msg: "Login OK", location: "/" }, { status: 200, headers: { 'Set-Cookie': "BBB=Nice; path=/" } });
-
-  return res;
 }
